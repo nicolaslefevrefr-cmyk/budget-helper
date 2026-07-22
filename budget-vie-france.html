@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget de vie — France</title>
+<meta name="description" content="Estimatif de budget de vie en France, comparé sur plusieurs cas d'étude.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #F5F2EA;
+  --card: #FFFFFF;
+  --ink: #1C2430;
+  --ink-soft: #5B6472;
+  --ink-faint: #8A8F98;
+  --rule: #DAD4C5;
+  --rule-strong: #C7BFAC;
+  --income: #2F6F5E;
+  --income-soft: #E7F0EC;
+  --income-bar: #7FD9B6;
+  --expense: #7A2E3A;
+  --expense-soft: #F3E7E6;
+  --expense-bar: #F0968A;
+  --stamp: #B8860B;
+  --stamp-soft: #F2E9D3;
+  --radius-s: 3px;
+  --serif: "Fraunces", "Iowan Old Style", serif;
+  --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--stamp); color: #fff; }
+a { color: inherit; }
+button, input, select { font-family: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ---------- Layout ---------- */
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 48px 24px 96px;
+}
+
+.masthead {
+  max-width: 640px;
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 10px;
+}
+
+.masthead h1 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(32px, 5vw, 46px);
+  line-height: 1.05;
+  margin: 0 0 14px;
+  letter-spacing: -0.01em;
+}
+
+.lede {
+  color: var(--ink-soft);
+  font-size: 15.5px;
+  margin: 0 0 16px;
+  max-width: 58ch;
+}
+
+.save-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .03em;
+  color: var(--ink-faint);
+}
+.save-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  transition: background-color .2s ease, box-shadow .2s ease;
+}
+.save-status.just-saved .save-dot {
+  background: var(--income);
+  box-shadow: 0 0 0 3px var(--income-soft);
+}
+.save-status.just-saved.save-status--error .save-dot {
+  background: var(--expense);
+  box-shadow: 0 0 0 3px var(--expense-soft);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-s);
+  padding: 24px 28px 26px;
+  margin-bottom: 20px;
+}
+
+.card h2, .table-section h2 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 20px;
+  margin: 0 0 6px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  letter-spacing: -0.01em;
+}
+.card h2 .num, .table-section h2 .num {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  padding: 2px 6px;
+  letter-spacing: .04em;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--ink-faint);
+  margin: 0 0 16px;
+}
+
+/* ---------- Cas d'étude ---------- */
+
+.scenario-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--rule-strong);
+  border-radius: 20px;
+  background: var(--paper);
+  padding: 4px 4px 4px 14px;
+  gap: 4px;
+}
+
+.chip-input {
+  border: none;
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+  padding: 6px 2px;
+  width: 140px;
+  min-width: 0;
+}
+.chip-input:focus { outline: none; }
+
+.chip-remove {
+  border: none;
+  background: none;
+  color: var(--ink-faint);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.chip-remove:hover:not(:disabled) { background: var(--expense-soft); color: var(--expense); }
+.chip-remove:disabled { opacity: .3; cursor: not-allowed; }
+
+.btn-add {
+  border: 1px dashed var(--rule-strong);
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  padding: 9px 14px;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+}
+.btn-add:hover { border-color: var(--ink); color: var(--ink); }
+
+/* ---------- Matrice (tableaux) ---------- */
+
+.matrix {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-bottom: 20px;
+}
+
+.table-section h2 { margin-bottom: 4px; }
+.table-section .hint { margin-bottom: 12px; }
+
+.table-wrap {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-s);
+  overflow-x: auto;
+}
+
+table.matrix-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.matrix-table th,
+.matrix-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  white-space: nowrap;
+  font-size: 13.5px;
+}
+
+.matrix-table thead th {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--card);
+  border-bottom: 1px solid var(--rule-strong);
+  white-space: nowrap;
+}
+
+.matrix-table tbody tr:last-child td { border-bottom: none; }
+
+/* Colonnes figées (poste + mode) pendant le défilement horizontal */
+.col-label {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--card);
+  min-width: 210px;
+  max-width: 210px;
+  white-space: normal;
+  box-shadow: 1px 0 0 var(--rule);
+}
+.col-mode {
+  position: sticky;
+  left: 210px;
+  z-index: 2;
+  background: var(--card);
+  min-width: 118px;
+  max-width: 118px;
+  box-shadow: 1px 0 0 var(--rule);
+}
+thead .col-label, thead .col-mode { z-index: 3; }
+
+.col-scenario { min-width: 150px; }
+.col-actions { min-width: 44px; width: 44px; }
+
+.group-row td {
+  position: static;
+  background: var(--paper);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* ---------- Champs dans les cellules ---------- */
+
+.row-label-input {
+  border: none;
+  background: transparent;
+  font-size: 13.5px;
+  color: var(--ink);
+  padding: 4px 2px;
+  border-bottom: 1px solid transparent;
+  width: 100%;
+  min-width: 0;
+  white-space: normal;
+}
+.row-label-input:focus { border-bottom: 1px solid var(--ink); outline: none; }
+
+.cell-value { min-width: 130px; }
+.cell-value .input-suffix { position: relative; display: block; }
+
+.cell-value input[type="number"] {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-s);
+  background: var(--paper);
+  padding: 7px 26px 7px 8px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+}
+.cell-value input[type="number"]:focus { border-color: var(--ink); }
+
+.cell-value .suffix {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+
+.cell-common { background: var(--stamp-soft); }
+
+.cell-computed {
+  font-family: var(--mono);
+  color: var(--ink-soft);
+  background: var(--paper);
+}
+
+.row-computed .col-label,
+.row-computed .col-mode { background: var(--paper); }
+
+.cell-highlight { font-weight: 600; color: var(--ink); }
+
+.cell-solde.is-positive { color: var(--income); font-weight: 600; }
+.cell-solde.is-negative { color: var(--expense); font-weight: 600; }
+
+/* Bascule Commun / Individuel */
+
+.mode-toggle {
+  border: 1px solid var(--rule-strong);
+  background: var(--card);
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .03em;
+  padding: 5px 9px;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mode-toggle.is-individual {
+  background: var(--stamp);
+  border-color: var(--stamp);
+  color: #fff;
+}
+.mode-toggle:hover { border-color: var(--ink); }
+
+/* Suppression de ligne */
+
+.matrix-table .remove {
+  border: none;
+  background: none;
+  color: var(--ink-faint);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-s);
+}
+.matrix-table .remove:hover { background: var(--expense-soft); color: var(--expense); }
+
+/* ---------- Notes & reset ---------- */
+
+.notes {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-faint);
+  max-width: 72ch;
+  margin: 4px 0 16px;
+}
+
+.btn-reset {
+  display: block;
+  border: none;
+  background: none;
+  color: var(--ink-soft);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  padding: 4px;
+}
+.btn-reset:hover { color: var(--expense); }
+
+.footer {
+  margin-top: 32px;
+  color: var(--ink-faint);
+  font-size: 12.5px;
+}
+
+/* ---------- Barre mobile ---------- */
+
+.mobile-bar { display: none; }
+
+@media (max-width: 960px) {
+  .mobile-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: var(--ink);
+    border: none;
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    z-index: 20;
+    cursor: pointer;
+  }
+  .mobile-bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 0 4px;
+    border-left: 1px solid rgba(255,255,255,.1);
+  }
+  .mobile-bar-item:first-child { border-left: none; }
+  .mobile-bar-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(245,242,234,.5);
+  }
+  .mobile-bar-item strong {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .mobile-bar-item--in strong { color: var(--income-bar); }
+  .mobile-bar-item--out strong { color: var(--expense-bar); }
+  .mobile-bar-item--solde strong { color: var(--paper); }
+  .mobile-bar-item--solde strong.is-negative { color: var(--expense-bar); }
+
+  .page { padding-bottom: 88px; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="masthead">
+    <p class="eyebrow">Carnet de comptes du foyer</p>
+    <h1>Budget de vie — France</h1>
+    <p class="lede">Salaires, autres rentrées et dépenses, comparés sur plusieurs cas d'étude. Une ligne « Commun » vaut pour tous les cas ; une ligne « Individuel » peut varier d'un cas à l'autre.</p>
+    <p class="save-status" id="save-status" role="status" aria-live="polite">
+      <span class="save-dot"></span>
+      <span class="save-status-text">Sauvegarde automatique locale</span>
+    </p>
+  </header>
+
+  <!-- CAS D'ETUDE -->
+  <section class="card scenario-manager" id="scenario-manager">
+    <h2>Cas d'étude</h2>
+    <p class="hint">Ex. : Baseline, Vente d'un appartement, Changement de poste…</p>
+    <div class="scenario-chips" id="scenario-chips"></div>
+    <button type="button" class="btn-add" id="add-scenario">+ Ajouter un cas</button>
+  </section>
+
+  <div class="matrix" id="matrix">
+
+    <!-- 01. SALAIRES -->
+    <section class="table-section">
+      <h2><span class="num">01</span> Salaires</h2>
+      <div class="table-wrap">
+        <table class="matrix-table" id="table-salaires"></table>
+      </div>
+    </section>
+
+    <!-- 02. AUTRES RENTREES -->
+    <section class="table-section">
+      <h2><span class="num">02</span> Autres rentrées</h2>
+      <p class="hint">Loyers perçus, pensions, revenus annexes…</p>
+      <div class="table-wrap">
+        <table class="matrix-table" id="table-rentrees"></table>
+      </div>
+      <button type="button" class="btn-add" id="add-income">+ Ajouter une rentrée</button>
+    </section>
+
+    <!-- 03. DEPENSES -->
+    <section class="table-section">
+      <h2><span class="num">03</span> Dépenses mensuelles</h2>
+      <p class="hint">Tout ce qui sort du foyer chaque mois — y compris les impôts.</p>
+      <div class="table-wrap">
+        <table class="matrix-table" id="table-depenses"></table>
+      </div>
+      <button type="button" class="btn-add" id="add-expense">+ Ajouter un poste</button>
+    </section>
+
+    <!-- 04. SYNTHESE -->
+    <section class="table-section">
+      <h2><span class="num">04</span> Synthèse</h2>
+      <div class="table-wrap">
+        <table class="matrix-table matrix-table--summary" id="table-synthese"></table>
+      </div>
+    </section>
+
+  </div>
+
+  <p class="notes">
+    Estimation simplifiée. Les impôts sont des postes de dépense comme les autres, à ajuster selon vos montants réels. Basculez une ligne sur « Individuel » pour lui donner une valeur propre à chaque cas ; elle reste « Commune » (une seule valeur partagée) sinon.
+  </p>
+
+  <button type="button" class="btn-reset" id="reset-btn">Réinitialiser les valeurs par défaut</button>
+
+  <footer class="footer">
+    <p>Vos données restent dans ce navigateur (aucun envoi, aucun serveur).</p>
+  </footer>
+
+</div>
+
+<!-- Barre mobile : reflète le premier cas d'étude -->
+<button type="button" class="mobile-bar" id="mobile-bar" aria-expanded="false" aria-label="Voir la synthèse détaillée">
+  <span class="mobile-bar-item mobile-bar-item--in">
+    <span class="mobile-bar-label">Rentrées</span>
+    <strong id="mobile-rentrees">—</strong>
+  </span>
+  <span class="mobile-bar-item mobile-bar-item--out">
+    <span class="mobile-bar-label">Sorties</span>
+    <strong id="mobile-sorties">—</strong>
+  </span>
+  <span class="mobile-bar-item mobile-bar-item--solde">
+    <span class="mobile-bar-label">Solde</span>
+    <strong id="mobile-solde">—</strong>
+  </span>
+</button>
+
+<script>
+"use strict";
+
+/* ---------- Constantes ---------- */
+
+const STORAGE_KEY = "budget-vie-france:v5";
+
+function defaultState() {
+  return {
+    scenarios: [{ id: "baseline", name: "Baseline" }],
+    salary: {
+      moi: {
+        brut: { mode: "common", common: 45000, values: {} },
+        taux: { mode: "common", common: 23, values: {} },
+      },
+      femme: {
+        brut: { mode: "common", common: 38000, values: {} },
+        taux: { mode: "common", common: 23, values: {} },
+      },
+    },
+    income: [
+      { id: "inc-loyers", label: "Loyers perçus", mode: "common", common: 1200, values: {} },
+    ],
+    expenses: [
+      { id: "exp-loyer", label: "Loyer (logement principal)", mode: "common", common: 1450, values: {} },
+      { id: "exp-ir", label: "Impôt sur les revenus", mode: "common", common: 400, values: {} },
+      { id: "exp-irloc", label: "Impôt lié aux locations", mode: "common", common: 100, values: {} },
+      { id: "exp-ecole", label: "Frais de scolarité", mode: "common", common: 350, values: {} },
+      { id: "exp-transport", label: "Transport", mode: "common", common: 180, values: {} },
+      { id: "exp-resto", label: "Restaurants", mode: "common", common: 200, values: {} },
+      { id: "exp-activites", label: "Activités", mode: "common", common: 120, values: {} },
+      { id: "exp-sorties", label: "Sorties / loisirs", mode: "common", common: 150, values: {} },
+      { id: "exp-courses", label: "Courses / alimentation", mode: "common", common: 600, values: {} },
+      { id: "exp-assurances", label: "Assurances", mode: "common", common: 130, values: {} },
+      { id: "exp-abonnements", label: "Abonnements", mode: "common", common: 80, values: {} },
+      { id: "exp-autres", label: "Autres dépenses", mode: "common", common: 150, values: {} },
+    ],
+  };
+}
+
+/* ---------- Formatage ---------- */
+
+const fmtEUR = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+const fmtEURCents = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 2 });
+
+function euros(n, cents = false) {
+  if (!isFinite(n)) n = 0;
+  return (cents ? fmtEURCents : fmtEUR).format(n);
+}
+function eurosCompact(n) {
+  if (!isFinite(n)) n = 0;
+  return new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(n) + " €";
+}
+
+const $ = (id) => document.getElementById(id);
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+
+let uidCounter = 0;
+function uid(prefix) {
+  uidCounter += 1;
+  return `${prefix}-${uidCounter}-${Math.random().toString(36).slice(2, 6)}`;
+}
+
+/* ---------- État ---------- */
+
+let state = loadState();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    return { ...defaultState(), ...parsed };
+  } catch (e) {
+    return defaultState();
+  }
+}
+
+let saveFlashTimeout = null;
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    flashSaved(true);
+  } catch (e) {
+    flashSaved(false);
+  }
+}
+
+function flashSaved(ok) {
+  const el = $("save-status");
+  if (!el) return;
+  el.classList.toggle("save-status--error", !ok);
+  el.querySelector(".save-status-text").textContent = ok
+    ? "Enregistré dans ce navigateur"
+    : "Échec de l'enregistrement local";
+  el.classList.add("just-saved");
+  clearTimeout(saveFlashTimeout);
+  saveFlashTimeout = setTimeout(() => {
+    el.classList.remove("just-saved");
+    el.querySelector(".save-status-text").textContent = "Sauvegarde automatique locale";
+  }, 1200);
+}
+
+/* ---------- Lignes : valeur commune ou individuelle ---------- */
+
+function getValue(row, scenarioId) {
+  if (row.mode === "individual") {
+    return (scenarioId in row.values) ? row.values[scenarioId] : row.common;
+  }
+  return row.common;
+}
+
+function setValue(row, scenarioId, isCommonCell, val) {
+  if (isCommonCell) {
+    row.common = val;
+  } else {
+    row.values[scenarioId] = val;
+  }
+}
+
+function getRowByPath(path) {
+  const parts = path.split(".");
+  if (parts[0] === "salary") return state.salary[parts[1]][parts[2]];
+  if (parts[0] === "income") return state.income.find((r) => r.id === parts[1]);
+  if (parts[0] === "expenses") return state.expenses.find((r) => r.id === parts[1]);
+  return null;
+}
+
+function cleanupScenarioValues(scenarioId) {
+  const rows = [
+    state.salary.moi.brut, state.salary.moi.taux,
+    state.salary.femme.brut, state.salary.femme.taux,
+    ...state.income, ...state.expenses,
+  ];
+  rows.forEach((row) => { if (row && row.values) delete row.values[scenarioId]; });
+}
+
+/* ---------- Calcul par cas ---------- */
+
+function computeForScenario(sid) {
+  const netAnnuelMoi = getValue(state.salary.moi.brut, sid) * (1 - getValue(state.salary.moi.taux, sid) / 100);
+  const netAnnuelFemme = getValue(state.salary.femme.brut, sid) * (1 - getValue(state.salary.femme.taux, sid) / 100);
+  const netMensuelMoi = netAnnuelMoi / 12;
+  const netMensuelFemme = netAnnuelFemme / 12;
+
+  const totalIncome = state.income.reduce((sum, r) => sum + (Number(getValue(r, sid)) || 0), 0);
+  const totalExpense = state.expenses.reduce((sum, r) => sum + (Number(getValue(r, sid)) || 0), 0);
+
+  const rentrees = netMensuelMoi + netMensuelFemme + totalIncome;
+  const sorties = totalExpense;
+  const solde = rentrees - sorties;
+
+  return { netMensuelMoi, netMensuelFemme, totalIncome, totalExpense, rentrees, sorties, solde, soldeAnnuel: solde * 12 };
+}
+
+/* ---------- Rendu : briques réutilisables ---------- */
+
+function renderHead(scenarios, withActions) {
+  const cols = scenarios.map((sc) => `<th class="col-scenario">${escapeHtml(sc.name)}</th>`).join("");
+  return `<thead><tr>
+    <th class="col-label">Poste</th>
+    <th class="col-mode">Mode</th>
+    ${cols}
+    ${withActions ? '<th class="col-actions"></th>' : ""}
+  </tr></thead>`;
+}
+
+function groupRow(label, colCount) {
+  return `<tr class="group-row"><td colspan="${colCount}">${escapeHtml(label)}</td></tr>`;
+}
+
+function modeToggle(path, row) {
+  const common = row.mode !== "individual";
+  return `<button type="button" class="mode-toggle ${common ? "" : "is-individual"}" data-mode-toggle="${path}">${common ? "Commun" : "Individuel"}</button>`;
+}
+
+function valueCells(path, row, unit) {
+  const scenarios = state.scenarios;
+  const step = unit === "%" ? "0.1" : "10";
+  if (row.mode !== "individual") {
+    return `<td class="cell-value cell-common" colspan="${scenarios.length}">
+      <span class="input-suffix">
+        <input type="number" inputmode="decimal" step="${step}" value="${row.common}" data-value-path="${path}" data-value-cell="common">
+        <span class="suffix">${unit}</span>
+      </span>
+    </td>`;
+  }
+  return scenarios.map((sc) => `
+    <td class="cell-value">
+      <span class="input-suffix">
+        <input type="number" inputmode="decimal" step="${step}" value="${getValue(row, sc.id)}" data-value-path="${path}" data-value-cell="individual" data-value-scenario="${sc.id}">
+        <span class="suffix">${unit}</span>
+      </span>
+    </td>`).join("");
+}
+
+function salaryRow(path, label, row, unit) {
+  return `<tr>
+    <td class="col-label">${label}</td>
+    <td class="col-mode">${modeToggle(path, row)}</td>
+    ${valueCells(path, row, unit)}
+  </tr>`;
+}
+
+function dynamicRow(path, row, unit) {
+  return `<tr>
+    <td class="col-label">
+      <input type="text" class="row-label-input" value="${escapeHtml(row.label)}" data-label-path="${path}" aria-label="Nom du poste">
+    </td>
+    <td class="col-mode">${modeToggle(path, row)}</td>
+    ${valueCells(path, row, unit)}
+    <td class="col-actions"><button type="button" class="remove" data-remove-path="${path}" title="Supprimer ce poste">×</button></td>
+  </tr>`;
+}
+
+function computedRow(label, scenarios, idFn, withActions, extraClass = "") {
+  const cells = scenarios.map((sc) => `<td class="cell-value cell-computed ${extraClass}" id="${idFn(sc.id)}">—</td>`).join("");
+  return `<tr class="row-computed ${extraClass}">
+    <td class="col-label">${label}</td>
+    <td class="col-mode">—</td>
+    ${cells}
+    ${withActions ? '<td class="col-actions"></td>' : ""}
+  </tr>`;
+}
+
+/* ---------- Rendu des 4 tableaux ---------- */
+
+function renderScenarioChips() {
+  const wrap = $("scenario-chips");
+  wrap.innerHTML = state.scenarios.map((sc) => `
+    <div class="chip">
+      <input type="text" class="chip-input" value="${escapeHtml(sc.name)}" data-scenario-rename="${sc.id}" aria-label="Nom du cas">
+      <button type="button" class="chip-remove" data-scenario-remove="${sc.id}" title="Supprimer ce cas" ${state.scenarios.length <= 1 ? "disabled" : ""}>×</button>
+    </div>
+  `).join("");
+}
+
+function renderSalaryTable() {
+  const scenarios = state.scenarios;
+  const n = 2 + scenarios.length;
+  const head = renderHead(scenarios, false);
+  const body = [
+    groupRow("Moi", n),
+    salaryRow("salary.moi.brut", "Salaire brut annuel", state.salary.moi.brut, "€"),
+    salaryRow("salary.moi.taux", "Taux de charges sociales", state.salary.moi.taux, "%"),
+    computedRow("Net mensuel", scenarios, (sid) => `net-moi-${sid}`, false, "cell-highlight"),
+    groupRow("Ma femme", n),
+    salaryRow("salary.femme.brut", "Salaire brut annuel", state.salary.femme.brut, "€"),
+    salaryRow("salary.femme.taux", "Taux de charges sociales", state.salary.femme.taux, "%"),
+    computedRow("Net mensuel", scenarios, (sid) => `net-femme-${sid}`, false, "cell-highlight"),
+  ].join("");
+  $("table-salaires").innerHTML = head + `<tbody>${body}</tbody>`;
+}
+
+function renderIncomeTable() {
+  const scenarios = state.scenarios;
+  const head = renderHead(scenarios, true);
+  const rows = state.income.map((r) => dynamicRow(`income.${r.id}`, r, "€")).join("");
+  const total = computedRow("Total autres rentrées", scenarios, (sid) => `total-income-${sid}`, true, "cell-highlight");
+  $("table-rentrees").innerHTML = head + `<tbody>${rows}${total}</tbody>`;
+}
+
+function renderExpenseTable() {
+  const scenarios = state.scenarios;
+  const head = renderHead(scenarios, true);
+  const rows = state.expenses.map((r) => dynamicRow(`expenses.${r.id}`, r, "€")).join("");
+  const total = computedRow("Total dépenses mensuelles", scenarios, (sid) => `total-expense-${sid}`, true, "cell-highlight");
+  $("table-depenses").innerHTML = head + `<tbody>${rows}${total}</tbody>`;
+}
+
+function renderSyntheseTable() {
+  const scenarios = state.scenarios;
+  const head = renderHead(scenarios, false);
+  const rows = [
+    computedRow("Total rentrées", scenarios, (sid) => `rentrees-${sid}`, false),
+    computedRow("Total dépenses", scenarios, (sid) => `sorties-${sid}`, false),
+    computedRow("Solde mensuel", scenarios, (sid) => `solde-${sid}`, false, "cell-solde"),
+    computedRow("Solde annuel", scenarios, (sid) => `solde-annuel-${sid}`, false),
+  ].join("");
+  $("table-synthese").innerHTML = head + `<tbody>${rows}</tbody>`;
+}
+
+function renderAll() {
+  renderScenarioChips();
+  renderSalaryTable();
+  renderIncomeTable();
+  renderExpenseTable();
+  renderSyntheseTable();
+  updateComputedDisplays();
+}
+
+function updateScenarioHeaders() {
+  document.querySelectorAll(".matrix-table thead").forEach((thead) => {
+    const ths = thead.querySelectorAll(".col-scenario");
+    ths.forEach((th, i) => {
+      const sc = state.scenarios[i];
+      if (sc) th.textContent = sc.name;
+    });
+  });
+}
+
+function setText(id, txt) {
+  const el = $(id);
+  if (el) el.textContent = txt;
+}
+
+function updateComputedDisplays() {
+  state.scenarios.forEach((sc) => {
+    const r = computeForScenario(sc.id);
+    setText(`net-moi-${sc.id}`, euros(r.netMensuelMoi, true));
+    setText(`net-femme-${sc.id}`, euros(r.netMensuelFemme, true));
+    setText(`total-income-${sc.id}`, euros(r.totalIncome, true));
+    setText(`total-expense-${sc.id}`, euros(r.totalExpense, true));
+    setText(`rentrees-${sc.id}`, euros(r.rentrees, true));
+    setText(`sorties-${sc.id}`, euros(r.sorties, true));
+    setText(`solde-annuel-${sc.id}`, euros(r.soldeAnnuel));
+
+    const soldeEl = $(`solde-${sc.id}`);
+    if (soldeEl) {
+      soldeEl.textContent = (r.solde >= 0 ? "+ " : "− ") + euros(Math.abs(r.solde), true);
+      soldeEl.classList.toggle("is-positive", r.solde >= 0);
+      soldeEl.classList.toggle("is-negative", r.solde < 0);
+    }
+  });
+
+  const first = state.scenarios[0];
+  if (first) {
+    const r0 = computeForScenario(first.id);
+    $("mobile-rentrees").textContent = eurosCompact(r0.rentrees);
+    $("mobile-sorties").textContent = eurosCompact(r0.sorties);
+    const soldeTxt = (r0.solde >= 0 ? "+" : "−") + " " + eurosCompact(Math.abs(r0.solde));
+    const mEl = $("mobile-solde");
+    mEl.textContent = soldeTxt;
+    mEl.classList.toggle("is-negative", r0.solde < 0);
+  }
+}
+
+/* ---------- Interactions : tableaux (délégation sur #matrix) ---------- */
+
+function focusLastLabel(tableId) {
+  const inputs = document.querySelectorAll(`#${tableId} .row-label-input`);
+  const last = inputs[inputs.length - 1];
+  if (last) { last.focus(); last.select(); }
+}
+
+function bindMatrix() {
+  const matrix = $("matrix");
+
+  matrix.addEventListener("input", (e) => {
+    const t = e.target;
+    if (t.dataset.valuePath !== undefined) {
+      const row = getRowByPath(t.dataset.valuePath);
+      if (!row) return;
+      const val = parseFloat(t.value) || 0;
+      const isCommon = t.dataset.valueCell === "common";
+      setValue(row, t.dataset.valueScenario, isCommon, val);
+      saveState();
+      updateComputedDisplays();
+      return;
+    }
+    if (t.dataset.labelPath !== undefined) {
+      const row = getRowByPath(t.dataset.labelPath);
+      if (!row) return;
+      row.label = t.value;
+      saveState();
+    }
+  });
+
+  matrix.addEventListener("click", (e) => {
+    const toggleBtn = e.target.closest("[data-mode-toggle]");
+    if (toggleBtn) {
+      const row = getRowByPath(toggleBtn.dataset.modeToggle);
+      if (row) {
+        row.mode = row.mode === "individual" ? "common" : "individual";
+        saveState();
+        renderAll();
+      }
+      return;
+    }
+
+    const removeBtn = e.target.closest("[data-remove-path]");
+    if (removeBtn) {
+      const path = removeBtn.dataset.removePath;
+      const dot = path.indexOf(".");
+      const kind = path.slice(0, dot);
+      const id = path.slice(dot + 1);
+      if (kind === "income") state.income = state.income.filter((r) => r.id !== id);
+      if (kind === "expenses") state.expenses = state.expenses.filter((r) => r.id !== id);
+      saveState();
+      renderAll();
+      return;
+    }
+
+    if (e.target.closest("#add-income")) {
+      state.income.push({ id: uid("inc"), label: "Nouvelle rentrée", mode: "common", common: 0, values: {} });
+      saveState();
+      renderAll();
+      focusLastLabel("table-rentrees");
+      return;
+    }
+
+    if (e.target.closest("#add-expense")) {
+      state.expenses.push({ id: uid("exp"), label: "Nouveau poste", mode: "common", common: 0, values: {} });
+      saveState();
+      renderAll();
+      focusLastLabel("table-depenses");
+    }
+  });
+}
+
+/* ---------- Interactions : cas d'étude ---------- */
+
+function bindScenarioManager() {
+  const manager = $("scenario-manager");
+
+  manager.addEventListener("input", (e) => {
+    const id = e.target.dataset.scenarioRename;
+    if (!id) return;
+    const sc = state.scenarios.find((s) => s.id === id);
+    if (sc) {
+      sc.name = e.target.value;
+      saveState();
+      updateScenarioHeaders();
+    }
+  });
+
+  manager.addEventListener("click", (e) => {
+    const removeBtn = e.target.closest("[data-scenario-remove]");
+    if (removeBtn) {
+      if (state.scenarios.length <= 1) return;
+      const id = removeBtn.dataset.scenarioRemove;
+      if (!confirm("Supprimer ce cas d'étude ? Les valeurs qui lui sont propres seront perdues.")) return;
+      state.scenarios = state.scenarios.filter((s) => s.id !== id);
+      cleanupScenarioValues(id);
+      saveState();
+      renderAll();
+      return;
+    }
+
+    if (e.target.closest("#add-scenario")) {
+      const n = state.scenarios.length + 1;
+      state.scenarios.push({ id: uid("case"), name: `Cas ${n}` });
+      saveState();
+      renderAll();
+    }
+  });
+}
+
+/* ---------- Réinitialisation ---------- */
+
+function bindReset() {
+  $("reset-btn").addEventListener("click", () => {
+    if (!confirm("Remettre toutes les valeurs par défaut ? Vos données saisies et vos cas d'étude seront perdus.")) return;
+    state = defaultState();
+    saveState();
+    renderAll();
+  });
+}
+
+/* ---------- Barre mobile ---------- */
+
+function bindMobileBar() {
+  $("mobile-bar").addEventListener("click", () => {
+    $("table-synthese").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+}
+
+/* ---------- Initialisation ---------- */
+
+function init() {
+  bindMatrix();
+  bindScenarioManager();
+  bindReset();
+  bindMobileBar();
+  renderAll();
+}
+
+document.addEventListener("DOMContentLoaded", init);
+
+</script>
+</body>
+</html>
