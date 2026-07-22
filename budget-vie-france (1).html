@@ -229,11 +229,13 @@ button, input, select { font-family: inherit; color: inherit; }
 table.matrix-table {
   border-collapse: separate;
   border-spacing: 0;
-  width: 100%;
+  table-layout: fixed;
+  width: max-content;
 }
 
 .matrix-table th,
 .matrix-table td {
+  box-sizing: border-box;
   padding: 10px 12px;
   border-bottom: 1px solid var(--rule);
   text-align: left;
@@ -260,8 +262,7 @@ table.matrix-table {
   left: 0;
   z-index: 2;
   background: var(--card);
-  min-width: 210px;
-  max-width: 210px;
+  width: 210px;
   white-space: normal;
   box-shadow: 1px 0 0 var(--rule);
 }
@@ -270,14 +271,13 @@ table.matrix-table {
   left: 210px;
   z-index: 2;
   background: var(--card);
-  min-width: 118px;
-  max-width: 118px;
+  width: 118px;
   box-shadow: 1px 0 0 var(--rule);
 }
 thead .col-label, thead .col-mode { z-index: 3; }
 
-.col-scenario { min-width: 150px; }
-.col-actions { min-width: 44px; width: 44px; }
+.col-scenario { width: 150px; }
+.col-actions { width: 44px; }
 
 .group-row td {
   position: static;
@@ -1028,6 +1028,22 @@ function bindMobileBar() {
   });
 }
 
+/* ---------- Défilement horizontal synchronisé entre les tableaux ---------- */
+
+function bindSyncScroll() {
+  const wraps = Array.from(document.querySelectorAll(".table-wrap"));
+  let syncing = false;
+  wraps.forEach((wrap) => {
+    wrap.addEventListener("scroll", () => {
+      if (syncing) return;
+      syncing = true;
+      const left = wrap.scrollLeft;
+      wraps.forEach((w) => { if (w !== wrap) w.scrollLeft = left; });
+      syncing = false;
+    });
+  });
+}
+
 /* ---------- Initialisation ---------- */
 
 function init() {
@@ -1035,6 +1051,7 @@ function init() {
   bindScenarioManager();
   bindReset();
   bindMobileBar();
+  bindSyncScroll();
   renderAll();
 }
 
